@@ -1,5 +1,6 @@
+package com.isep.meia.grupo7;
+
 import com.isep.meia.grupo7.jade.agents.*;
-import com.isep.meia.grupo7.jade.agents.Models.PedidoDeDistância;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
