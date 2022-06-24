@@ -1,34 +1,20 @@
 package com.isep.meia.grupo7.jade.agents.Models;
 
-import java.io.Serializable;
 import java.util.Random;
 
-public class RespostaHighResIsFire implements Serializable {
+public class HighResScanResponse extends Response {
 
-
-    private String idOrigem;
-    private boolean resultado;
-
-    public RespostaHighResIsFire(String idOrigem) {
-        this.idOrigem = idOrigem;
+    public HighResScanResponse(String originId) {
+        super(originId);
         Random objGenerator = new Random();
-        this.resultado = objGenerator.nextBoolean();
+        this.result = objGenerator.nextBoolean();
     }
 
-
-    public String getIdOrigem() {
-        return idOrigem;
+    public boolean getResult() {
+        return (boolean) result;
     }
 
-    public void setIdOrigem(String idOrigem) {
-        this.idOrigem = idOrigem;
-    }
-
-    public boolean getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(boolean resultado) {
-        this.resultado = resultado;
+    public void setResult(boolean result) {
+        this.result = result;
     }
 }

@@ -11,46 +11,43 @@ import java.io.IOException;
 public class ActuatorDrone extends jade.core.Agent {
 
     protected void setup() {
-        //System.out.println("Hello World!");
-
-
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 ACLMessage msg = blockingReceive();
                 try {
-                    Object a = msg.getContentObject();
-                    if(a instanceof PedidoDeDistância){
-                        PedidoDeDistância operacao = (PedidoDeDistância)a;
+                    Object contentObject = msg.getContentObject();
+                    if(contentObject instanceof AuctionScoreRequest){
+                        AuctionScoreRequest request = (AuctionScoreRequest)contentObject;
                         System.out.println("Received high res request");
-                        ACLMessage msgResp = new ACLMessage(ACLMessage.INFORM);
+                        ACLMessage aclResponse = new ACLMessage(ACLMessage.INFORM);
                         AID id =  new AID();
-                        id.setLocalName(operacao.getIdOrigem());
-                        msgResp.addReceiver(id);
-                        RespostaDistancia resposta = new RespostaDistancia(this.getAgent().getLocalName());
-                        msgResp.setContentObject(resposta);
+                        id.setLocalName(request.getOriginId());
+                        aclResponse.addReceiver(id);
+                        AuctionScoreResponse answer = new AuctionScoreResponse(this.getAgent().getLocalName());
+                        aclResponse.setContentObject(answer);
 
-                        send(msgResp);
-                        System.out.println("Sent From " + this.getAgent().getLocalName() + " an answer with value "+ resposta.getResultado() + " to " + operacao.getIdOrigem());
+                        send(aclResponse);
+                        System.out.println("Sent From " + this.getAgent().getLocalName() + " an answer with value "+ answer.getResult() + " to " + request.getOriginId());
                     }
 
-                    if(msg.getContentObject() instanceof PedidoDeHighResIsFire){
-                        PedidoDeHighResIsFire pedido = (PedidoDeHighResIsFire)msg.getContentObject();
-                        System.out.println("Received a request to go check the fire on " + this.getAgent().getLocalName());
-                        ACLMessage msgResp = new ACLMessage(ACLMessage.INFORM);
+                    if(msg.getContentObject() instanceof HighResScanRequest){
+                        HighResScanRequest request = (HighResScanRequest)msg.getContentObject();
+                        System.out.println("Received a request for high res scan on " + this.getAgent().getLocalName());
+                        ACLMessage aclResponse = new ACLMessage(ACLMessage.INFORM);
                         AID id =  new AID();
                         id.setLocalName("ActuatorServer");
-                        msgResp.addReceiver(id);
-                        RespostaHighResIsFire resposta = new RespostaHighResIsFire(this.getAgent().getLocalName());
-                        msgResp.setContentObject(resposta);
+                        aclResponse.addReceiver(id);
+                        HighResScanResponse answer = new HighResScanResponse(this.getAgent().getLocalName());
+                        aclResponse.setContentObject(answer);
 
-                        send(msgResp);
-                        System.out.println("Sent a response to the " +pedido.getIdOrigem() + " with an info");
+                        send(aclResponse);
+                        System.out.println("Sent a response to the " +request.getOriginId() + " with an info");
 
                     }
-                    if(msg.getContentObject() instanceof PedidoDeApagarFogo){
-                        PedidoDeApagarFogo pedido = (PedidoDeApagarFogo)msg.getContentObject();
-                        System.out.println("Pedido para apagar fogo no drone " + this.getAgent().getLocalName()+" nas coordenadas" + pedido.getX()+":"+pedido.getY());
+                    if(msg.getContentObject() instanceof FireSuppressionRequest){
+                        FireSuppressionRequest request = (FireSuppressionRequest)msg.getContentObject();
+                        System.out.println("Fire Suppression request by drone " + this.getAgent().getLocalName()+" on coords: " + request.getX()+","+request.getY());
                     }
 
 

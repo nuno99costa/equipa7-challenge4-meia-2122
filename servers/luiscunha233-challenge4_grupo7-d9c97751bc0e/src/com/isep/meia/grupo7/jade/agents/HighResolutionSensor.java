@@ -20,32 +20,32 @@ public class HighResolutionSensor extends jade.core.Agent {
                 ACLMessage msg = blockingReceive();
                 try {
                     Object a = msg.getContentObject();
-                    if(a instanceof PedidoDeDistância){
-                        PedidoDeDistância operacao = (PedidoDeDistância)a;
+                    if(a instanceof AuctionScoreRequest){
+                        AuctionScoreRequest operacao = (AuctionScoreRequest)a;
                         System.out.println("Received high res request");
                         ACLMessage msgResp = new ACLMessage(ACLMessage.INFORM);
                         AID id =  new AID();
-                        id.setLocalName(operacao.getIdOrigem());
+                        id.setLocalName(operacao.getOriginId());
                         msgResp.addReceiver(id);
-                        RespostaDistancia resposta = new RespostaDistancia(this.getAgent().getLocalName());
+                        AuctionScoreResponse resposta = new AuctionScoreResponse(this.getAgent().getLocalName());
                         msgResp.setContentObject(resposta);
 
                         send(msgResp);
-                        System.out.println("Sent From " + this.getAgent().getLocalName() + " an answer with value "+ resposta.getResultado() + " to " + operacao.getIdOrigem());
+                        System.out.println("Sent From " + this.getAgent().getLocalName() + " an answer with value "+ resposta.getResult() + " to " + operacao.getOriginId());
                     }
 
-                    if(msg.getContentObject() instanceof PedidoDeHighResIsFire){
-                        PedidoDeHighResIsFire pedido = (PedidoDeHighResIsFire)msg.getContentObject();
+                    if(msg.getContentObject() instanceof HighResScanRequest){
+                        HighResScanRequest pedido = (HighResScanRequest)msg.getContentObject();
                         System.out.println("Received a request to go check the fire on " + this.getAgent().getLocalName());
                         ACLMessage msgResp = new ACLMessage(ACLMessage.INFORM);
                         AID id =  new AID();
                         id.setLocalName("ActuatorServer");
                         msgResp.addReceiver(id);
-                        RespostaHighResIsFire resposta = new RespostaHighResIsFire(this.getAgent().getLocalName());
+                        HighResScanResponse resposta = new HighResScanResponse(this.getAgent().getLocalName());
                         msgResp.setContentObject(resposta);
 
                         send(msgResp);
-                        System.out.println("Sent a response to the " +pedido.getIdOrigem() + " with an info");
+                        System.out.println("Sent a response to the " +pedido.getOriginId() + " with an info");
 
                         ACLMessage msgResp2 = new ACLMessage(ACLMessage.INFORM);
                         AID id2 =  new AID();
