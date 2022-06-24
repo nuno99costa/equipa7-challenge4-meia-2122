@@ -33,7 +33,6 @@ public class SensorServer extends jade.core.Agent {
             public void action() {
                 ACLMessage msg = blockingReceive();
 
-
                 try {
                     if (msg.getContentObject() instanceof AuctionScoreResponse) {
 

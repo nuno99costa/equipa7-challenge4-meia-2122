@@ -1,6 +1,8 @@
 package com.isep.meia.grupo7.jade.agents.Models;
 
-public class Request {
+import java.io.Serializable;
+
+public class Request implements Serializable {
 
     protected String originId;
     protected int x;
