@@ -22,11 +22,11 @@ public class Main {
         try {
 
             for (int i = 0; i < 4; i++) {
-                mc.createNewAgent("HighResolutionSensor" + i, HighResolutionSensor.class.getCanonicalName(), agentArgs).start();
+                mc.createNewAgent("HighResolutionSensor" + i, HighResolutionAgent.class.getCanonicalName(), agentArgs).start();
 
             }
             for (int i = 0; i < 4; i++) {
-                mc.createNewAgent("ActuatorDrone" + i, ActuatorDrone.class.getCanonicalName(), agentArgs).start();
+                mc.createNewAgent("ActuatorDrone" + i, ActuatorAgent.class.getCanonicalName(), agentArgs).start();
 
             }
 

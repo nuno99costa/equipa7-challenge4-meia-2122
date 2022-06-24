@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class AuctionScoreResponse extends Response {
 
+    //Should this response include original information on localization?
     public AuctionScoreResponse(String originId) {
         super(originId);
         Random objGenerator = new Random();

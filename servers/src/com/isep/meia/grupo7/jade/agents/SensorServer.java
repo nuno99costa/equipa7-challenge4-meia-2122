@@ -1,8 +1,8 @@
 package com.isep.meia.grupo7.jade.agents;
 
 import com.isep.meia.grupo7.jade.agents.Models.AuctionScoreRequest;
-import com.isep.meia.grupo7.jade.agents.Models.HighResScanRequest;
 import com.isep.meia.grupo7.jade.agents.Models.AuctionScoreResponse;
+import com.isep.meia.grupo7.jade.agents.Models.HighResScanRequest;
 import com.isep.meia.grupo7.jade.agents.Models.HighResScanResponse;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -15,18 +15,13 @@ import java.util.ArrayList;
 
 public class SensorServer extends jade.core.Agent {
 
+    private final int highResAgents = 4;
+    private ArrayList<AuctionScoreResponse> responses;
+    private ArrayList<Integer> usedAgents;
 
-    private ArrayList<AuctionScoreResponse> responses ;
-    private ArrayList<Integer> used;
-    private int numberOfHigh =4;
     protected void setup() {
-        //System.out.println("Hello World!");
-
-        Object[] clienteArgs = this.getArguments();
-
-        responses = new ArrayList<AuctionScoreResponse>();
-        used = new ArrayList<Integer>();
-
+        responses = new ArrayList<>();
+        usedAgents = new ArrayList<>();
 
         addBehaviour(new CyclicBehaviour() {
             @Override
@@ -35,88 +30,81 @@ public class SensorServer extends jade.core.Agent {
 
                 try {
                     if (msg.getContentObject() instanceof AuctionScoreResponse) {
+                        AuctionScoreResponse auctionScoreResponse = (AuctionScoreResponse) msg.getContentObject();
+                        System.out.println(auctionScoreResponse.getResult() + " received");
+                        responses.add(auctionScoreResponse);
 
-                        AuctionScoreResponse respostaHighRes = (AuctionScoreResponse)msg.getContentObject();
-
-                        System.out.println(respostaHighRes.getResult() + " received");
-                       responses.add(respostaHighRes);
-                        if(responses.size()==numberOfHigh-used.size()){
-                            float min =100000;
-                            AuctionScoreResponse minResp = new AuctionScoreResponse("");
-                            for(AuctionScoreResponse respon : responses){
-                                if(respon.getResult()<min){
-                                    minResp=respon;
+                        if (responses.size() == highResAgents - usedAgents.size()) {
+                            float min = Float.MAX_VALUE;
+                            AuctionScoreResponse minResp = new AuctionScoreResponse(null);
+                            for (AuctionScoreResponse response : responses) {
+                                if (response.getResult() < min) {
+                                    minResp = response;
                                 }
                             }
-                             ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 
-                        AID id3 = new AID();
-                        id3.setLocalName(minResp.getOriginId());
+                            ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
 
-                        msg3.addReceiver(id3);
+                            AID aid = new AID();
+                            aid.setLocalName(minResp.getOriginId());
 
-                            HighResScanRequest pedido = new HighResScanRequest(5,5,this.getAgent().getLocalName());
-                            used.add(Integer.parseInt(minResp.getOriginId().replaceAll("[^0-9]", "")));
-                        try {
-                            msg3.setContentObject(pedido);
+                            aclMessage.addReceiver(aid);
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        send(msg3);
-                        System.out.println("Sent a call to check the area to " + minResp.getOriginId());
-                        }
-
-
-
-                    }
-                    if(msg.getContentObject() instanceof AuctionScoreRequest){
-
-                        for (int i = 0; i < numberOfHigh; i++) {
-                            if(!used.contains(i)){
-                            AuctionScoreRequest operacao = (AuctionScoreRequest)msg.getContentObject();
-
-                            ACLMessage msg4 = new ACLMessage(ACLMessage.INFORM);
-
-                            AID id = new AID();
-
-                                id.setLocalName("HighResolutionSensor" + i);
-
-
-
-                            msg4.addReceiver(id);
-
-                            AuctionScoreRequest operacao2 = new AuctionScoreRequest(operacao.getX(),operacao.getY(),this.getAgent().getLocalName());
+                            //TODO - This does not actually work correctly (static coordinates)
+                            HighResScanRequest highResScanRequest = new HighResScanRequest(5, 5, this.getAgent().getLocalName());
+                            usedAgents.add(Integer.parseInt(minResp.getOriginId().replaceAll("\\D", "")));
                             try {
-                                msg4.setContentObject(operacao2);
+                                aclMessage.setContentObject(highResScanRequest);
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
-                            send(msg4);
+                            send(aclMessage);
+                            System.out.println("Sent a call to check the area to " + minResp.getOriginId());
+                        }
 
-                            System.out.println("Sent From " +this.getAgent().getLocalName() + " a High Res Request to High Resolution Sensor " +i );
-                        }}
+
+                    }
+                    if (msg.getContentObject() instanceof AuctionScoreRequest) {
+
+                        for (int i = 0; i < highResAgents; i++) {
+                            if (!usedAgents.contains(i)) {
+                                AuctionScoreRequest auctionScoreRequest = (AuctionScoreRequest) msg.getContentObject();
+
+                                ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
+
+                                AID aid = new AID();
+
+                                aid.setLocalName("HighResolutionSensor" + i);
+
+
+                                aclMessage.addReceiver(aid);
+
+                                AuctionScoreRequest auctionScoreRequest1 = new AuctionScoreRequest(auctionScoreRequest.getX(), auctionScoreRequest.getY(), this.getAgent().getLocalName());
+
+                                try {
+                                    aclMessage.setContentObject(auctionScoreRequest1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                send(aclMessage);
+
+                                System.out.println("Sent From " + this.getAgent().getLocalName() + " a High Res Request to High Resolution Sensor " + i);
+                            }
+                        }
 
                     }
                     if (msg.getContentObject() instanceof HighResScanResponse) {
-                        HighResScanResponse resposta = (HighResScanResponse)msg.getContentObject();
-                        used.remove(Integer.valueOf(Integer.parseInt(resposta.getOriginId().replaceAll("[^0-9]", ""))));
+                        HighResScanResponse highResScanResponse = (HighResScanResponse) msg.getContentObject();
+                        usedAgents.remove(Integer.valueOf(Integer.parseInt(highResScanResponse.getOriginId().replaceAll("\\D", ""))));
                     }
-
-
                 } catch (UnreadableException e) {
                     e.printStackTrace();
                 }
-
             }
         });
-
-
-    }
-    public void removeUsed(Integer i ){
-        used.remove(i);
     }
 }
 

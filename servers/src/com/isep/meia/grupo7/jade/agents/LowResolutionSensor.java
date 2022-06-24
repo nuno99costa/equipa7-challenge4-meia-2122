@@ -2,48 +2,36 @@ package com.isep.meia.grupo7.jade.agents;
 
 import com.isep.meia.grupo7.jade.agents.Models.AuctionScoreRequest;
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.io.IOException;
 
 
-public class LowResolutionSensor extends jade.core.Agent {
+public class LowResolutionSensor extends Agent {
 
-    private AuctionScoreRequest operacao;
     protected void setup() {
-        //System.out.println("Hello World!");
-
-        Object[] clienteArgs = this.getArguments();
-
-
-
-
-
-
         addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
-                    AuctionScoreRequest operacao = new AuctionScoreRequest(5,5,this.getAgent().getLocalName());
-                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                AuctionScoreRequest auctionScoreRequest = new AuctionScoreRequest(5, 5, this.getAgent().getLocalName());
 
-                    AID id = new AID();
-                    id.setLocalName("SensorServer");
+                ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
+                AID aid = new AID();
+                aid.setLocalName("SensorServer");
+                aclMessage.addReceiver(aid);
 
-                    msg.addReceiver(id);
-
-
-                    try {
-                        msg.setContentObject(operacao);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    send(msg);
-                    System.out.println("Sent From " +this.getAgent().getLocalName() + " a High Res Request to Server  Sensor ");
+                try {
+                    aclMessage.setContentObject(auctionScoreRequest);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-        });
 
+                send(aclMessage);
+                System.out.println("Sent from " + this.getAgent().getLocalName() + " a High Res Request to Server  Sensor ");
+            }
+        });
 
 
     }
