@@ -11,81 +11,70 @@ import java.util.ArrayList;
 
 
 public class ActuatorServer extends jade.core.Agent {
-
-
-    private ArrayList<RespostaDistancia> responses ;
-    private int numberOfHigh =2;
+    
     protected void setup() {
-        //System.out.println("Hello World!");
-
-        Object[] clienteArgs = this.getArguments();
-        responses = new ArrayList<RespostaDistancia>();
-
-
-
-
+        ArrayList<AuctionScoreResponse> responses = new ArrayList<>();
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 ACLMessage msg = blockingReceive();
-
-
                 try {
-
-                    if (msg.getContentObject() instanceof RespostaHighResIsFire) {
-                        RespostaHighResIsFire respostaHighRes = (RespostaHighResIsFire) msg.getContentObject();
-                        System.out.println(respostaHighRes.getResultado() + " received from " + respostaHighRes.getIdOrigem());
-                        if(respostaHighRes.getResultado()==true){
+                    if (msg.getContentObject() instanceof HighResScanResponse) {
+                        HighResScanResponse highResResponse = (HighResScanResponse) msg.getContentObject();
+                        System.out.println(highResResponse.getResult() + " received from " + highResResponse.getOriginId());
+                        if(highResResponse.getResult()){
                             for(int i = 0 ; i<2;i++) {
-                                ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+                                ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 
-                                AID id3 = new AID();
-                                id3.setLocalName("ActuatorDrone"+i);
+                                AID agent = new AID();
+                                agent.setLocalName("ActuatorDrone"+i);
 
-                                msg3.addReceiver(id3);
+                                message.addReceiver(agent);
 
-                                PedidoDeDistância pedido = new PedidoDeDistância(5, 5, this.getAgent().getLocalName());
+                                AuctionScoreRequest request = new AuctionScoreRequest(5, 5, this.getAgent().getLocalName());
                                 try {
-                                    msg3.setContentObject(pedido);
+                                    message.setContentObject(request);
 
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
 
-                                send(msg3);
-                                System.out.println("Sent a call to check the area to Actuator Drone" +i);
+                                send(message);
+                                System.out.println("Sent a call to check area to Actuator Drone" +i);
                             }
                         }
                     }
-                    if (msg.getContentObject() instanceof RespostaDistancia) {
-                        RespostaDistancia respostaHighRes = (RespostaDistancia)msg.getContentObject();
-                        System.out.println(respostaHighRes.getResultado() + " received");
-                        responses.add(respostaHighRes);
+                    if (msg.getContentObject() instanceof AuctionScoreResponse) {
+                        AuctionScoreResponse response = (AuctionScoreResponse)msg.getContentObject();
+                        System.out.println(response.getResult() + " received");
+                        responses.add(response);
                         if(responses.size()==2){
-                            float min =100000;
-                            RespostaDistancia minResp = new RespostaDistancia("");
-                            for(RespostaDistancia respon : responses){
-                                if(respon.getResultado()<min){
-                                    minResp=respon;
+                            float min = Float.MAX_VALUE;
+                            AuctionScoreResponse minResp = null;
+                            for(AuctionScoreResponse auctionScoreResponse : responses){
+                                if(auctionScoreResponse.getResult() < min){
+                                    minResp=auctionScoreResponse;
                                 }
                             }
-                            ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+                            ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 
-                            AID id3 = new AID();
-                            id3.setLocalName(minResp.getIdOrigem());
+                            AID agent = new AID();
+                            if (minResp != null) {
+                                agent.setLocalName(minResp.getOriginId());
+                            }
 
-                            msg3.addReceiver(id3);
+                            message.addReceiver(agent);
 
-                            PedidoDeApagarFogo pedido = new PedidoDeApagarFogo(5,5,this.getAgent().getLocalName());
+                            FireSuppressionRequest fireSuppressionRequest = new FireSuppressionRequest(5,5,this.getAgent().getLocalName());
                             try {
-                                msg3.setContentObject(pedido);
+                                message.setContentObject(fireSuppressionRequest);
 
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
-                            send(msg3);
-                            System.out.println("Sent a call to check the area to " + minResp.getIdOrigem());
+                            send(message);
+                            System.out.println("Sent a call to check the area to " + (minResp != null ? minResp.getOriginId() : "null"));
                         }
 
 
