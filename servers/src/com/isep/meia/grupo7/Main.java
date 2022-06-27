@@ -5,10 +5,14 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
 
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
+        ArrayList<Drone> drones =  Optimizer.run(600, 600);
+        System.out.println(drones);
+
         jade.core.Runtime rt = jade.core.Runtime.instance();
         rt.setCloseVM(true);
         Profile pMain = new ProfileImpl();
