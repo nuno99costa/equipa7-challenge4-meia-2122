@@ -22,13 +22,13 @@ public class ModelFactory {
 
     public static ArrayList<Drone> convert2drones(Genotype<IntegerGene> solution, int[] dronesRange)
     {
-        ArrayList<Drone> circles = new ArrayList<Drone>();
+        ArrayList<Drone> circles = new ArrayList<>();
         int droneIndx = 0;
         for(int i=0; i < solution.length(); i+= 2)
         {
             circles.add(new Drone(
-                    solution.get(i).gene().allele(), // X0
-                    solution.get(i+1).gene().allele(),// y0
+                    solution.get(i).gene().allele(),
+                    solution.get(i+1).gene().allele(),
                     dronesRange[droneIndx]
             ));
             droneIndx++;

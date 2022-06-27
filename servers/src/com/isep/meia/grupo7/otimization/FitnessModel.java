@@ -17,35 +17,88 @@ public class FitnessModel {
     }
 
     // Estimation of overlapping circles' areas
-    public static double overlap(Drone c1, Drone c2)
+    private static double overlap(Drone d0, Drone d1)
     {
-        int x1 = c1.getX(), y1 = c1.getY(), r1 = c1.getR();
-        int x2 = c2.getX(), y2 = c2.getY(), r2 = c2.getR();
+        int x0 = d0.getX(), y0 = d0.getY(), r0 = d0.getR();
+        int x1 = d1.getX(), y1 = d1.getY(), r1 = d1.getR();
+        double rr0 = r0 * r0;
+        double rr1 = r1 * r1;
+        double d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 
-        double d = Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
-        if (d < r1 + r2){
-            double a = r1 * r1;
-            double b = r2 * r2;
-
-            double x = (a - b + d * d) / (2 * d);
-
-            double z = x * x;
-            double y = Math.sqrt(a - z);
-
-            if (d <= Math.abs(r2 - r1)) {
-                return Math.PI * Math.min(a, b);
-            }
-            return a * Math.asin(y / r1) + b * Math.asin(y / r2) - y * (x + Math.sqrt(z + b - a));
+        // Circles do not overlap
+        if (d > r1 + r0)
+        {
+            return 0;
         }
-        return 0; // Two circles don't overlap
+
+        // Circle1 is completely inside circle0
+        else if (d <= Math.abs(r0 - r1) && r0 >= r1)
+        {
+            // Return area of circle1
+            return Math.PI * rr1;
+        }
+
+        // Circle0 is completely inside circle1
+        else if (d <= Math.abs(r0 - r1) && r0 < r1)
+        {
+            // Return area of circle0
+            return Math.PI * rr0;
+        }
+
+        // Circles partially overlap
+        else
+        {
+            double phi = (Math.acos((rr0 + (d * d) - rr1) / (2 * r0 * d))) * 2;
+            double theta = (Math.acos((rr1 + (d * d) - rr0) / (2 * r1 * d))) * 2;
+            double area1 = 0.5 * theta * rr1 - 0.5 * rr1 * Math.sin(theta);
+            double area2 = 0.5 * phi * rr0 - 0.5 * rr0 * Math.sin(phi);
+
+            // Return area of intersection
+            return area1 + area2;
+        }
     }
 
-    private static double areaOutside(Drone c)
+    private double areaOutside(Drone drone)
     {
-        return 0;
+        int xleft = 0, xright = w, ytop = h, ybottom = 0;
+        int x = drone.getX(), y = drone.getY(), r = drone.getR();
+
+        double[] d = {0,0,0,0};
+        d[0] = (x-xleft)/r;
+        d[1] = (ytop-y)/r;
+        d[2] = (xright-x)/r;
+        d[3] = (y-ybottom)/r;
+
+        double area = 0;
+
+        boolean f = true;
+        for (double di:d) {
+            if(di<1) {
+                f = false;
+                break;
+            }
+        }
+        if(f)
+            return area;
+
+        double[] a = {0,0,0,0};
+        for (int i = 0; i < 4; i++){
+            if(d[i] < 1){
+                a[i] = Math.abs(Math.asin(d[i]));
+                double v = Math.PI - 2 * a[i] - Math.sin(2 * a[i]);
+                area += r * r / 2 * v;
+            }
+        }
+
+        for (int i = 0; i < 4; i++){
+            int adj = (i+1) % 4;
+            if(d[i] < 1 && d[adj] < 1 && d[i]*d[i] + d[adj] *d[adj] < 1){
+                area -= r * r / 4 * (Math.PI - 2 * a[i] - 2 * a[adj] - Math.sin(2*a[i]) - Math.sin(2*a[adj]) + 4 * Math.sin(a[i]) * Math.sin(a[adj]));
+            }
+        }
+        return area;
     }
 
-    // There are goes our general fitness function
     public double scalarFitness(final Genotype model)
     {
         ArrayList<Drone> drones = ModelFactory.convert2drones(model, dronesRange);

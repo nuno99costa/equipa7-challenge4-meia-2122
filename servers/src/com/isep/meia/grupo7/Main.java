@@ -1,6 +1,7 @@
 package com.isep.meia.grupo7;
 
 import com.isep.meia.grupo7.jade.agents.*;
+import com.isep.meia.grupo7.otimization.*;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
@@ -10,10 +11,11 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        ArrayList<Drone> drones =  Optimizer.run(600, 600);
+        int[] dronesRange = {100,100,100,100,100,150};
+        ArrayList<Drone> drones =  Optimizer.run(600, 600, dronesRange);
         System.out.println(drones);
 
-        jade.core.Runtime rt = jade.core.Runtime.instance();
+        /*jade.core.Runtime rt = jade.core.Runtime.instance();
         rt.setCloseVM(true);
         Profile pMain = new ProfileImpl();
         pMain.setParameter(Profile.MTPS, null);
@@ -43,7 +45,7 @@ public class Main {
             }
         } catch (Exception ignored) {
             ignored.printStackTrace();
-        }
+        }*/
     }
 
 }

@@ -29,7 +29,7 @@ public class FPViewer extends JPanel {
         g2.drawOval(x+border-r, y+border-r, r*2, r*2);
 
         if(!label.isEmpty()) {
-            g2.drawString(label, x - 5 + border, y + border);
+            g2.drawString(label, x - 5 + border, y + 5 + border);
         }
     }
 

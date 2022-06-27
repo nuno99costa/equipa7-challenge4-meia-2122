@@ -14,20 +14,23 @@ import static io.jenetics.engine.Limits.bySteadyFitness;
 
 public class Optimizer {
 
-    public static ArrayList<Drone> run(int width, int height)
+    public static ArrayList<Drone> run(int width, int height, int[] dronesRange)
     {
-        String[] droneNames = {"#1", "#2", "#3", "#4", "#5", "#6"};
-        int[] dronesRange = {50,100,90,110,75,60};
         int nDrones = dronesRange.length;
+        String[] droneNames = new String[nDrones];
+        for (int i = 0; i < nDrones; i++) {
+            droneNames[i] = String.format("#%d", i+1);
+        }
 
         FitnessModel fm = new FitnessModel(width, height, dronesRange);
         Factory<Genotype<IntegerGene>> model = ModelFactory.of(width, height, nDrones);
-        // Creation of our genetic evolution engine
+
+        // Creation of genetic evolution engine
         Engine<IntegerGene, Double> engine = Engine.builder(fm.getFitness(), model)
                 .populationSize(40)
                 .optimize(Optimize.MINIMUM)
                 .alterers(
-                        new Mutator<>(.05),
+                        new Mutator<>(.1),
                         new MeanAlterer<>(.5)
                 )
                 .build();
