@@ -30,7 +30,7 @@ public class ActuatorServer extends jade.core.Agent {
 
                                 message.addReceiver(agent);
 
-                                AuctionScoreRequest request = new AuctionScoreRequest(5, 5, this.getAgent().getLocalName());
+                                AuctionScoreRequest request = new AuctionScoreRequest(highResResponse.x, highResResponse.y, this.getAgent().getLocalName());
                                 try {
                                     message.setContentObject(request);
 
@@ -51,8 +51,10 @@ public class ActuatorServer extends jade.core.Agent {
                             float min = Float.MAX_VALUE;
                             AuctionScoreResponse minResp = null;
                             for (AuctionScoreResponse auctionScoreResponse : responses) {
-                                if (auctionScoreResponse.getResult() < min) {
-                                    minResp = auctionScoreResponse;
+                                double fitness = fitness(auctionScoreResponse.getResult(), auctionScoreResponse.battery);
+                                if (fitness < min) {
+                                    min = (float) fitness;
+                                    minResp = response;
                                 }
                             }
                             ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -64,7 +66,7 @@ public class ActuatorServer extends jade.core.Agent {
 
                             message.addReceiver(agent);
 
-                            FireSuppressionRequest fireSuppressionRequest = new FireSuppressionRequest(5, 5, this.getAgent().getLocalName());
+                            FireSuppressionRequest fireSuppressionRequest = new FireSuppressionRequest(minResp.x, minResp.y, this.getAgent().getLocalName());
                             try {
                                 message.setContentObject(fireSuppressionRequest);
 
@@ -84,6 +86,12 @@ public class ActuatorServer extends jade.core.Agent {
         });
 
 
+    }
+    private static double fitness(double distance, int battery)
+    {
+        double distanceWeight = 0.2;
+        double batteryWeigh = 1;
+        return distance * distanceWeight - battery * batteryWeigh;
     }
 }
 

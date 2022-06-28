@@ -11,11 +11,11 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        int[] dronesRange = {100,100,100,100,100,150};
-        ArrayList<Drone> drones =  Optimizer.run(600, 600, dronesRange);
-        System.out.println(drones);
+        int[] dronesRange = {100,100,100,100,100};
+        //ArrayList<Drone> drones =  Optimizer.run(600, 600, dronesRange);
+        //System.out.println(drones);
 
-        /*jade.core.Runtime rt = jade.core.Runtime.instance();
+        jade.core.Runtime rt = jade.core.Runtime.instance();
         rt.setCloseVM(true);
         Profile pMain = new ProfileImpl();
         pMain.setParameter(Profile.MTPS, null);
@@ -37,15 +37,16 @@ public class Main {
             }
 
 
-            mc.createNewAgent("SensorServer", SensorServer.class.getCanonicalName(), agentArgs).start();
+
             mc.createNewAgent("ActuatorServer", ActuatorServer.class.getCanonicalName(), agentArgs).start();
             for (int i = 0; i < 2; i++) {
                 mc.createNewAgent("LowResolutionSensor" + i, LowResolutionSensor.class.getCanonicalName(), agentArgs).start();
-                Thread.sleep(10000);
+
             }
+            mc.createNewAgent("SensorServer", SensorServer.class.getCanonicalName(), agentArgs).start();
         } catch (Exception ignored) {
             ignored.printStackTrace();
-        }*/
+        }
     }
 
 }

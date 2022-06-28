@@ -25,7 +25,7 @@ public class ActuatorAgent extends Agent {
                         AID id = new AID();
                         id.setLocalName(request.getOriginId());
                         aclResponse.addReceiver(id);
-                        AuctionScoreResponse answer = new AuctionScoreResponse(this.getAgent().getLocalName());
+                        AuctionScoreResponse answer = new AuctionScoreResponse(this.getAgent().getLocalName(), request.getX(), request.getY());
                         aclResponse.setContentObject(answer);
 
                         send(aclResponse);
@@ -40,7 +40,7 @@ public class ActuatorAgent extends Agent {
                         AID id = new AID();
                         id.setLocalName("ActuatorServer");
                         aclResponse.addReceiver(id);
-                        HighResScanResponse answer = new HighResScanResponse(this.getAgent().getLocalName());
+                        HighResScanResponse answer = new HighResScanResponse(this.getAgent().getLocalName(), request.getX(), request.getY());
                         aclResponse.setContentObject(answer);
 
                         send(aclResponse);

@@ -27,11 +27,11 @@ public class HighResolutionAgent extends Agent {
                         aid.setLocalName(auctionScoreRequest.getOriginId());
                         aclMessage.addReceiver(aid);
 
-                        AuctionScoreResponse auctionScoreResponse = new AuctionScoreResponse(this.getAgent().getLocalName());
+                        AuctionScoreResponse auctionScoreResponse = new AuctionScoreResponse(this.getAgent().getLocalName(), auctionScoreRequest.getX(), auctionScoreRequest.getY());
                         aclMessage.setContentObject(auctionScoreResponse);
 
                         send(aclMessage);
-                        System.out.println("Sent from " + this.getAgent().getLocalName() + " an answer with value "+ auctionScoreResponse.getResult() + " to " + auctionScoreRequest.getOriginId());
+                        System.out.println("Sent from " + this.getAgent().getLocalName() + " an answer with values "+ auctionScoreResponse.getResult() + " and " + auctionScoreResponse.battery + " to " + auctionScoreRequest.getOriginId() );
                     }
 
                     if(msg.getContentObject() instanceof HighResScanRequest){
@@ -42,7 +42,7 @@ public class HighResolutionAgent extends Agent {
                         AID aid =  new AID();
                         aid.setLocalName("ActuatorServer");
                         aclMessage.addReceiver(aid);
-                        HighResScanResponse highResScanResponse = new HighResScanResponse(this.getAgent().getLocalName());
+                        HighResScanResponse highResScanResponse = new HighResScanResponse(this.getAgent().getLocalName(), highResScanRequest.getX(), highResScanRequest.getY());
                         aclMessage.setContentObject(highResScanResponse);
 
                         send(aclMessage);
